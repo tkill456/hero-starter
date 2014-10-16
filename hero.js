@@ -176,11 +176,36 @@ var moves = {
   // This hero will try really hard not to die.
   coward : function(gameData, helpers) {
     return helpers.findNearestHealthWell(gameData);
+  },
+
+  // Custom strategy
+  custom : function(gameData, helpers) {
+	var myHero = gameData.activeHero;
+	if (myHero.health < 50) {
+	    return helpers.findNearestHealthWell(gameData);
+	}
+
+	var nearestWeakerEnemy = helpers.findNearestWeakerEnemy(gameData);
+	if (nearestWeakerEnemy) {
+	    return nearestWeakerEnemy;
+	}
+
+	var findNearestUnownedDiamondMine = helpers.findNearestUnownedDiamondMine(gameData);
+	if (findNearestUnownedDiamondMine) {
+	    return findNearestUnownedDiamondMine;
+	}
+
+	var findNearestNonTeamDiamondMine = helpers.findNearestNonTeamDiamondMine(gameData);
+	if (findNearestNonTeamDiamondMine) {
+	    return findNearestNonTeamDiamondMine;
+	}
+
+	return false;
   }
  };
 
 //  Set our heros strategy
-var  move =  moves.carefulAssassin;
+var  move =  moves.custom;
 
 // Export the move function here
 module.exports = move;
