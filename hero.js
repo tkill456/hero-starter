@@ -181,6 +181,20 @@ var moves = {
   // Custom strategy
   custom : function(gameData, helpers) {
 	var myHero = gameData.activeHero;
+
+	// Get stats on the nearest enemy who can be beaten
+	var enemyStats = helpers.findNearestObjectDirectionAndDistance(gameData.board, myHero, function(boardTile) {
+		if (boardTile.type === 'Hero'
+				&& boardTile.team !== hero.team
+				&& boardTile.health <= hero.health + 20) {
+			return true;
+		}
+	});
+	// Take him out if he's right here
+	if (enemyStats.distance === 1 && ) {
+		return enemyStats.direction;
+	}
+
 	if (myHero.health < 50) {
 	    return helpers.findNearestHealthWell(gameData);
 	}
