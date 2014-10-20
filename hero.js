@@ -191,7 +191,7 @@ var moves = {
 		}
 	});
 	// Take him out if he's right here
-	if (enemyStats.distance === 1 && ) {
+	if (enemyStats.distance === 1) {
 		return enemyStats.direction;
 	}
 
