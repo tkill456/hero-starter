@@ -182,41 +182,46 @@ var moves = {
   custom : function(gameData, helpers) {
 	var myHero = gameData.activeHero;
 
-	// Get stats on the nearest enemy who can be beaten
-	var enemyStats = helpers.findNearestObjectDirectionAndDistance(gameData.board, myHero, function(boardTile) {
-		if (boardTile.type === 'Hero'
-				&& boardTile.team !== hero.team
-				&& boardTile.health <= hero.health + 20) {
+
+	//Get stats on the nearest enemy who can be beaten
+	var beatableEnemyStats = helpers.findNearestObjectDirectionAndDistance(gameData.board, myHero, helpers.beatableEnemy(myHero));
+	if (beatableEnemyStats.distance === 1) {
+		return beatableEnemyStats.direction;
+	}
+
+
+	//Get stats on the nearest health well
+	var healthWellStats = helpers.findNearestObjectDirectionAndDistance(gameData.board, myHero, function(boardTile) {
+		if (boardTile.type === 'HealthWell') {
 			return true;
 		}
 	});
-	// Take him out if he's right here
-	if (enemyStats.distance === 1) {
-		return enemyStats.direction;
-	}
+
+	var distanceToHealthWell = healthWellStats.distance;
+	var directionToHealthWell = healthWellStats.direction;
 
 	if (myHero.health < 50) {
-	    return helpers.findNearestHealthWell(gameData);
+		//Heal no matter what if low health
+		return directionToHealthWell;
+	} else if (myHero.health < 100 && distanceToHealthWell === 1) {
+		//Heal if you aren't full health and are close to a health well already
+		return directionToHealthWell;
 	}
 
-	var nearestWeakerEnemy = helpers.findNearestWeakerEnemy(gameData);
-	if (nearestWeakerEnemy) {
-	    return nearestWeakerEnemy;
+
+	//Get stats on the nearest non-team diamond mine
+	var diamondMineStats = helpers.findNearestObjectDirectionAndDistance(gameData.board, myHero, helpers.nonTeamDiamondMine(myHero));
+
+	if (diamondMineStats.distance <= beatableEnemyStats.distance) {
+		return diamondMineStats.direction;
+	} else {
+		return beatableEnemyStats.direction;
 	}
 
-	var findNearestUnownedDiamondMine = helpers.findNearestUnownedDiamondMine(gameData);
-	if (findNearestUnownedDiamondMine) {
-	    return findNearestUnownedDiamondMine;
-	}
-
-	var findNearestNonTeamDiamondMine = helpers.findNearestNonTeamDiamondMine(gameData);
-	if (findNearestNonTeamDiamondMine) {
-	    return findNearestNonTeamDiamondMine;
-	}
 
 	return false;
-  }
- };
+	}
+};
 
 //  Set our heros strategy
 var  move =  moves.custom;

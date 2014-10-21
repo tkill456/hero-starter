@@ -246,4 +246,29 @@ helpers.findNearestTeamMember = function(gameData) {
   return pathInfoObject.direction;
 };
 
+
+//
+// Tile Callbacks
+//
+helpers.beatableEnemy = function(hero) {
+	return function(enemyTile) {
+		return enemyTile.type === 'Hero' && enemyTile.team !== hero.team && enemyTile.health <= hero.health + 20;
+	};
+}
+
+helpers.nonTeamDiamondMine = function(hero) {
+	return function(mineTile) {
+		if (mineTile.type === 'DiamondMine') {
+			if (mineTile.owner) {
+				return mineTile.owner.team !== hero.team;
+			} else {
+				return true;
+			}
+		} else {
+			return false;
+		}
+	};
+}
+
+
 module.exports = helpers;
