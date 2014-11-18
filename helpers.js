@@ -270,5 +270,31 @@ helpers.nonTeamDiamondMine = function(hero) {
 	};
 }
 
+helpers.unownedDiamondMine = function(hero) {
+	return function(mineTile) {
+		if (mineTile.type === 'DiamondMine') {
+			if (mineTile.owner) {
+                return mineTile.owner.id !== hero.id;
+			} else {
+				return true;
+			}
+		} else {
+			return false;
+		}
+	};
+}
+
+helpers.getNumberOfAdjacentEnemies = function(board, hero) {
+    var numberOfAdjacentEnemies = 0;
+    var directions = ['North', 'East', 'South', 'West'];
+    for (var i = 0; i < directions.length; i++) {
+      var nextTile = helpers.getTileNearby(board, hero.distanceFromTop, hero.distanceFromLeft, directions[i]);
+      if (nextTile && nextTile.type === 'Hero' && nextTile.team !== hero.team) {
+        numberOfAdjacentEnemies++;
+      }
+    }
+    return numberOfAdjacentEnemies;
+}
+
 
 module.exports = helpers;

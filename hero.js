@@ -182,42 +182,41 @@ var moves = {
   custom : function(gameData, helpers) {
 	var myHero = gameData.activeHero;
 
-
+	//Get number of adjacent enemies
+    var numberOfAdjacentEnemies = helpers.getNumberOfAdjacentEnemies(gameData.board, myHero);
 	//Get stats on the nearest enemy who can be beaten
 	var beatableEnemyStats = helpers.findNearestObjectDirectionAndDistance(gameData.board, myHero, helpers.beatableEnemy(myHero));
-	if (beatableEnemyStats.distance === 1) {
-		return beatableEnemyStats.direction;
-	}
-
-
 	//Get stats on the nearest health well
 	var healthWellStats = helpers.findNearestObjectDirectionAndDistance(gameData.board, myHero, function(boardTile) {
 		if (boardTile.type === 'HealthWell') {
 			return true;
 		}
 	});
+	//Get stats on the nearest diamond mine not owned by me
+	var diamondMineStats = helpers.findNearestObjectDirectionAndDistance(gameData.board, myHero, helpers.unownedDiamondMine(myHero));
 
-	var distanceToHealthWell = healthWellStats.distance;
-	var directionToHealthWell = healthWellStats.direction;
+
+    if (numberOfAdjacentEnemies > 1 && myHero.health < 80) {
+		return healthWellStats.direction;
+    }
+
+	if (beatableEnemyStats.distance === 1) {
+		return beatableEnemyStats.direction;
+	}
 
 	if (myHero.health < 50) {
 		//Heal no matter what if low health
-		return directionToHealthWell;
-	} else if (myHero.health < 100 && distanceToHealthWell === 1) {
+		return healthWellStats.direction;
+	} else if (myHero.health < 100 && healthWellStats.distance === 1) {
 		//Heal if you aren't full health and are close to a health well already
-		return directionToHealthWell;
+		return healthWellStats.direction;
 	}
-
-
-	//Get stats on the nearest non-team diamond mine
-	var diamondMineStats = helpers.findNearestObjectDirectionAndDistance(gameData.board, myHero, helpers.nonTeamDiamondMine(myHero));
 
 	if (diamondMineStats.distance <= beatableEnemyStats.distance) {
 		return diamondMineStats.direction;
 	} else {
 		return beatableEnemyStats.direction;
 	}
-
 
 	return false;
 	}
