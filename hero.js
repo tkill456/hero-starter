@@ -194,6 +194,12 @@ var moves = {
 	});
 	//Get stats on the nearest diamond mine not owned by me
 	var diamondMineStats = helpers.findNearestObjectDirectionAndDistance(gameData.board, myHero, helpers.unownedDiamondMine(myHero));
+	//Get stats on the nearest grave
+	var graveStats = helpers.findNearestObjectDirectionAndDistance(gameData.board, myHero, function(boardTile) {
+		if (boardTile.subType === 'Bones') {
+			return true;
+		}
+	});
 
 
     if (numberOfAdjacentEnemies > 1 && myHero.health < 80) {
@@ -202,6 +208,10 @@ var moves = {
 
 	if (beatableEnemyStats.distance === 1) {
 		return beatableEnemyStats.direction;
+	}
+
+	if (graveStats.distance === 1) {
+		return graveStats.direction;
 	}
 
 	if (myHero.health < 50) {
