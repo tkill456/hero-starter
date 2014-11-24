@@ -208,6 +208,9 @@ var moves = {
     if (beatableEnemyStats.distance === 1) {
       return beatableEnemyStats.direction;
     }
+    if (beatableEnemyStats.distance === 2) {
+      return beatableEnemyStats.direction;
+    }
     if (graveStats.distance === 1) {
       return graveStats.direction;
     }
@@ -220,9 +223,11 @@ var moves = {
       return healthWellStats.direction;
     }
 
-    if (diamondMineStats.distance <= beatableEnemyStats.distance) {
+    if (diamondMineStats.direction) {
       return diamondMineStats.direction;
-    } else {
+    }
+
+    if (beatableEnemyStats.direction) {
       return beatableEnemyStats.direction;
     }
 
