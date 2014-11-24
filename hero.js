@@ -180,59 +180,57 @@ var moves = {
 
   // Custom strategy
   custom : function(gameData, helpers) {
-	var myHero = gameData.activeHero;
+    var myHero = gameData.activeHero;
 
-	//Get number of adjacent enemies
+    // Get number of adjacent enemies
     var numberOfAdjacentEnemies = helpers.getNumberOfAdjacentEnemies(gameData.board, myHero);
-	//Get stats on the nearest enemy who can be beaten
-	var beatableEnemyStats = helpers.findNearestObjectDirectionAndDistance(gameData.board, myHero, helpers.beatableEnemy(myHero));
-	//Get stats on the nearest health well
-	var healthWellStats = helpers.findNearestObjectDirectionAndDistance(gameData.board, myHero, function(boardTile) {
-		if (boardTile.type === 'HealthWell') {
-			return true;
-		}
-	});
-	//Get stats on the nearest diamond mine not owned by me
-	var diamondMineStats = helpers.findNearestObjectDirectionAndDistance(gameData.board, myHero, helpers.unownedDiamondMine(myHero));
-	//Get stats on the nearest grave
-	var graveStats = helpers.findNearestObjectDirectionAndDistance(gameData.board, myHero, function(boardTile) {
-		if (boardTile.subType === 'Bones') {
-			return true;
-		}
-	});
-
+    // Get stats on the nearest enemy who can be beaten
+    var beatableEnemyStats = helpers.findNearestObjectDirectionAndDistance(gameData.board, myHero, helpers.beatableEnemy(myHero));
+    // Get stats on the nearest health well
+    var healthWellStats = helpers.findNearestObjectDirectionAndDistance(gameData.board, myHero, function(boardTile) {
+      if (boardTile.type === 'HealthWell') {
+        return true;
+      }
+    });
+    // Get stats on the nearest diamond mine not owned by me
+    var diamondMineStats = helpers.findNearestObjectDirectionAndDistance(gameData.board, myHero, helpers.unownedDiamondMine(myHero));
+    // Get stats on the nearest grave
+    var graveStats = helpers.findNearestObjectDirectionAndDistance(gameData.board, myHero, function(boardTile) {
+      if (boardTile.subType === 'Bones') {
+        return true;
+      }
+    });
 
     if (numberOfAdjacentEnemies > 1 && myHero.health < 80) {
-		return healthWellStats.direction;
+      return healthWellStats.direction;
     }
 
-	if (beatableEnemyStats.distance === 1) {
-		return beatableEnemyStats.direction;
-	}
+    if (beatableEnemyStats.distance === 1) {
+      return beatableEnemyStats.direction;
+    }
+    if (graveStats.distance === 1) {
+      return graveStats.direction;
+    }
 
-	if (graveStats.distance === 1) {
-		return graveStats.direction;
-	}
+    if (myHero.health < 50) {
+      // Heal no matter what if low health
+      return healthWellStats.direction;
+    } else if (myHero.health < 100 && healthWellStats.distance === 1) {
+      // Heal if you aren't full health and are close to a health well already
+      return healthWellStats.direction;
+    }
 
-	if (myHero.health < 50) {
-		//Heal no matter what if low health
-		return healthWellStats.direction;
-	} else if (myHero.health < 100 && healthWellStats.distance === 1) {
-		//Heal if you aren't full health and are close to a health well already
-		return healthWellStats.direction;
-	}
+    if (diamondMineStats.distance <= beatableEnemyStats.distance) {
+      return diamondMineStats.direction;
+    } else {
+      return beatableEnemyStats.direction;
+    }
 
-	if (diamondMineStats.distance <= beatableEnemyStats.distance) {
-		return diamondMineStats.direction;
-	} else {
-		return beatableEnemyStats.direction;
-	}
-
-	return false;
-	}
+    return false;
+  }
 };
 
-//  Set our heros strategy
+// Set our heros strategy
 var  move =  moves.custom;
 
 // Export the move function here
